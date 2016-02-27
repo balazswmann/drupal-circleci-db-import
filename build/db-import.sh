@@ -8,7 +8,7 @@ SCRIPT_PATH=$(dirname "$0")
 ARTIFACTS_PATH=$(cd $SCRIPT_PATH/artifacts && pwd)
 
 # Check if artifacts/db_backup.sql.gz is exist.
-if [ -e $ARTIFACTS_PATH/adb_backup.sql.gz ]
+if [ -e $ARTIFACTS_PATH/db_backup.sql.gz ]
 then
   # Extract and import the database.
   pv $ARTIFACTS_PATH/db_backup.sql.gz | gunzip | mysql -u 'ubuntu' --password='' circle_test

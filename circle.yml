@@ -25,8 +25,8 @@ dependencies:
     - sudo chmod +x build/acquia-get-db-backup.sh
     - sudo chmod +rx build/acquia-get-db-backup-id.php
     - build/acquia-get-db-backup.sh [realm:mysite] [environment] [mysite]
-    - sudo chmod +x build/import-db.sh
-    - build/import-db.sh
+    - sudo chmod +x build/db-import.sh
+    - build/db-import.sh
     - mkdir www/sites/default/files
     - sudo chmod -R +rw www/sites/default/files
     - cp circle/settings.php www/sites/default/settings.php
