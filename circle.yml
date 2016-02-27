@@ -1,0 +1,47 @@
+machine:
+  php:
+    version: 5.5.21
+
+dependencies:
+  pre:
+    # Install Pipe Viewer to display mysql database import progress.
+    - sudo apt-get install pv
+    # Set up a virtual host for the site.
+    - echo "sendmail_path=/bin/true" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    - echo "memory_limit=256M" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    - sudo cp circle/circle.conf /etc/apache2/sites-available/default
+    - sudo sed -e "s?%PROJECT_DIR%?$(pwd)/www?g" --in-place /etc/apache2/sites-available/default
+    - sudo a2enmod rewrite
+    - sudo service apache2 restart
+  override:
+    # Get packages with Composer.
+    - sudo composer self-update
+    - composer install --prefer-dist
+  post:
+    # Create tmp and private directories.
+    - mkdir -p /tmp/[mysite]
+    - mkdir -p /tmp/[mysite]-private
+    # Download the production database and set up the site.
+    - sudo chmod +x build/acquia-get-db-backup.sh
+    - sudo chmod +rx build/acquia-get-db-backup-id.php
+    - build/acquia-get-db-backup.sh [realm:mysite] [environment] [mysite]
+    - sudo chmod +x build/import-db.sh
+    - build/import-db.sh
+    - mkdir www/sites/default/files
+    - sudo chmod -R +rw www/sites/default/files
+    - cp circle/settings.php www/sites/default/settings.php
+    - sudo chown -R $(whoami):www-data www
+    # Set tmp and private file system paths.
+    - bin/drush -r www vset --exact file_temporary_path "/tmp/[mysite]"
+    - bin/drush -r www vset --exact file_private_path "/tmp/[mysite]-private"
+  cache_directories:
+    - build/artifacts
+    - vendor
+    - bin
+
+test:
+  override:
+    # Run Behat with BEHAT_PARAMS.
+    - bin/behat:
+        environment:
+          BEHAT_PARAMS: $(<circle/behatp.json)

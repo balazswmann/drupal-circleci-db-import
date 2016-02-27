@@ -1,0 +1,31 @@
+# In order to run the tests in a specified environment, the base_url parameter must
+# be provided for Behat before testing. You can set it with the following command:
+#
+#   $ export BEHAT_PARAMS='{"extensions" : {"Behat\\MinkExtension" : {"base_url" : "[base_url]"}}}'
+#
+# Where the leading $ indicates the prompt and [base_url] is a placeholder. Additional paramters
+# can be provided as well. For more information see:
+#
+#   http://docs.behat.org/en/latest/guides/6.profiles.html#environment-variable-behat-params
+#
+# Different profiles can be used with the --profile [profile_name] parameter, where [profile_name]
+# is a placeholder.
+
+# -----------------------------------------
+# ----------- Default profile -------------
+# -----------------------------------------
+default:
+  suites:
+    default:
+      contexts:
+        - FeatureContext
+        - Drupal\DrupalExtension\Context\DrupalContext
+        - Drupal\DrupalExtension\Context\MinkContext
+  extensions:
+    Behat\MinkExtension:
+      goutte: ~
+    Drupal\DrupalExtension:
+      blackbox: ~
+      api_driver: 'drupal'
+      drupal:
+        drupal_root: 'www'
